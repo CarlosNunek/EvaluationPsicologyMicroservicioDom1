@@ -11,14 +11,15 @@ def client():
 
 def test_ingresar_evaluacion_exito(client):
     payload = {
-        "id_recluso": "1234567890",
-        "nivel_agresividad": "alto",
-        "trastornos": "ninguno",
-        "estabilidad_emocional": "estable",
-        "riesgo_reincidencia": "bajo",
-        "tiempo_entre_rejas": 24,
+        "id_recluso": "1725279812",
+        "nivel_agresividad": 4,
+        "trastornos": "Transtorno de personalidad, Transtorno de depresion",
+        "estabilidad_emocional": "Alta",
+        "riesgo_reincidencia": 8,
+        "tiempo_encarcelado": 24,
         "puntaje_psicologico": 85,
-        "edad": 30
+        "edad": 30,
+        "observaciones": "Requiere tratamiento"
     }
     response = client.post("/api/ingresar_evaluacion",
                            data=json.dumps(payload),
