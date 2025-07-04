@@ -3,13 +3,21 @@ import pytest
 from app import app
 from unittest.mock import patch, MagicMock
 
-@patch("app.mongo")  # 👈 esto mockea el objeto mongo en tu app
-def test_ingresar_evaluacion_exito(mock_mongo, client):
-    # Simula un resultado de insert_one con un ID falso
-    mock_insert_result = MagicMock()
-    mock_insert_result.inserted_id = "fake_id_123"
-    mock_mongo.db.evaluaciones_psicologicas.insert_one.return_value = mock_insert_result
+@pytest.fixture
+def client():
+    app.config["TESTING"] = True
+    with app.test_client() as client:
+        yield client
 
+@pytest.fixture
+def mock_mongo():
+    with patch("app.mongo") as mock:
+        mock_insert_result = MagicMock()
+        mock_insert_result.inserted_id = "fake_id_123"
+        mock.db.evaluaciones_psicologicas.insert_one.return_value = mock_insert_result
+        yield mock
+
+def test_ingresar_evaluacion_exito(client, mock_mongo):
     payload = {
         "id_recluso": "1725279812",
         "nivel_agresividad": 4,
