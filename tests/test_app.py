@@ -14,7 +14,7 @@ def client():
     with app.test_client() as client:
         yield client
 
-@patch("app.config.mongo.mongo.db.evaluaciones_psicologicas.insert_one")
+@patch("config.mongo.mongo.db.evaluaciones_psicologicas.insert_one")
 def test_ingresar_evaluacion_exito(mock_insert, client):
     mock_insert.return_value.inserted_id = "fake_id_123"
 
@@ -38,4 +38,3 @@ def test_ingresar_evaluacion_exito(mock_insert, client):
     data = response.get_json()
     assert "id" in data
     assert data["id"] == "fake_id_123"
-
