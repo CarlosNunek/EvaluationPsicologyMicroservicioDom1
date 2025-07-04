@@ -1,7 +1,7 @@
 import json
 import pytest
 from app import app
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 @pytest.fixture
 def client():
@@ -9,15 +9,10 @@ def client():
     with app.test_client() as client:
         yield client
 
-@pytest.fixture
-def mock_mongo():
-    with patch("app.mongo") as mock:
-        mock_insert_result = MagicMock()
-        mock_insert_result.inserted_id = "fake_id_123"
-        mock.db.evaluaciones_psicologicas.insert_one.return_value = mock_insert_result
-        yield mock
+@patch("app.mongo.db.evaluaciones_psicologicas.insert_one")
+def test_ingresar_evaluacion_exito(mock_insert, client):
+    mock_insert.return_value.inserted_id = "fake_id_123"
 
-def test_ingresar_evaluacion_exito(client, mock_mongo):
     payload = {
         "id_recluso": "1725279812",
         "nivel_agresividad": 4,
@@ -38,3 +33,4 @@ def test_ingresar_evaluacion_exito(client, mock_mongo):
     data = response.get_json()
     assert "id" in data
     assert data["id"] == "fake_id_123"
+
