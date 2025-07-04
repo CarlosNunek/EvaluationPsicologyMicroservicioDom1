@@ -24,7 +24,7 @@ def test_ingresar_evaluacion_exito(client, mock_insert_one):
     payload = {
         "id_recluso": "1725279812",
         "nivel_agresividad": 4,
-        "trastornos": "Transtorno de personalidad, Transtorno de depresion",
+        "trastornos": ["Transtorno de personalidad, Transtorno de depresion"],
         "estabilidad_emocional": "Alta",
         "riesgo_reincidencia": 8,
         "tiempo_encarcelado": 24,
