@@ -1,11 +1,5 @@
 import pytest
-import mongomock
-import sys
-import os
-from unittest.mock import patch
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
+from unittest.mock import patch, MagicMock
 from app import app
 
 @pytest.fixture
@@ -27,11 +21,13 @@ def test_ingresar_evaluacion_exito(client):
         "observaciones": "Requiere tratamiento"
     }
 
-    with patch("services.evaluation_service.mongo") as mock_mongo:
+    # Parcheamos el insert_one donde realmente se usa: en evaluation_repository
+    with patch("repositories.evaluation_repository.mongo") as mock_mongo:
         mock_mongo.db.evaluaciones_psicologicas.insert_one.return_value.inserted_id = "fake_id_123"
+
         response = client.post("/api/ingresar_evaluacion", json=payload)
 
-    assert response.status_code == 201
-    data = response.get_json()
-    assert "id" in data
-    assert data["id"] == "fake_id_123"
+        assert response.status_code == 201
+        data = response.get_json()
+        assert data["id"] == "fake_id_123"
+
