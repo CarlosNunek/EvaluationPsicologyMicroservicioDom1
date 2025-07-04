@@ -1,16 +1,19 @@
 import json
 import pytest
-
+import mongomock
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app import app
+from app import app,init_mongo
 from unittest.mock import patch, MagicMock
 
 @pytest.fixture
-def client():
-    app.config["TESTING"] = True
+def client(monkeypatch):
+    # Mockeamos mongo.db para usar mongomock
+    mock_client = mongomock.MongoClient()
+    monkeypatch.setattr(init_mongo, 'db', mock_client.dbname)
+    
     with app.test_client() as client:
         yield client
 
