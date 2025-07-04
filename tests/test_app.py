@@ -1,29 +1,20 @@
-import json
 import pytest
 import mongomock
 import sys
 import os
+from unittest.mock import patch
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app import app,init_mongo
-from unittest.mock import patch, MagicMock
+from app import app
 
 @pytest.fixture
-def client(monkeypatch):
-    # Mockeamos mongo.db para usar mongomock
-    mock_client = mongomock.MongoClient()
-    monkeypatch.setattr(init_mongo, 'db', mock_client.dbname)
-    
+def client():
+    app.config['TESTING'] = True
     with app.test_client() as client:
         yield client
 
-@pytest.fixture
-def mock_insert_one():
-    with patch("config.mongo.mongo.db.evaluaciones_psicologicas.insert_one") as mock_insert:
-        mock_insert.return_value.inserted_id = "fake_id_123"
-        yield mock_insert
-
-def test_ingresar_evaluacion_exito(client, mock_insert_one):
+def test_ingresar_evaluacion_exito(client):
     payload = {
         "id_recluso": "1725279812",
         "nivel_agresividad": 4,
@@ -36,11 +27,11 @@ def test_ingresar_evaluacion_exito(client, mock_insert_one):
         "observaciones": "Requiere tratamiento"
     }
 
-    response = client.post("/api/ingresar_evaluacion", json=payload)
-    print("STATUS:", response.status_code)
-    print("RESPONSE:", response.get_json())
+    with patch("services.evaluation_service.mongo.db.evaluaciones_psicologicas.insert_one") as mock_insert:
+        mock_insert.return_value.inserted_id = "fake_id_123"
+        response = client.post("/api/ingresar_evaluacion", json=payload)
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     data = response.get_json()
     assert "id" in data
     assert data["id"] == "fake_id_123"
