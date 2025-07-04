@@ -1,4 +1,5 @@
 from repositories.evaluation_repository import almacenar_evaluacion_psicologica
+from config.mongo import mongo
 
 def procesar_evaluacion(data):
 

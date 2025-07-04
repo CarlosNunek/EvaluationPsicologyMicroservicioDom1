@@ -27,8 +27,8 @@ def test_ingresar_evaluacion_exito(client):
         "observaciones": "Requiere tratamiento"
     }
 
-    with patch("services.evaluation_service.mongo.db.evaluaciones_psicologicas.insert_one") as mock_insert:
-        mock_insert.return_value.inserted_id = "fake_id_123"
+    with patch("services.evaluation_service.mongo") as mock_mongo:
+        mock_mongo.db.evaluaciones_psicologicas.insert_one.return_value.inserted_id = "fake_id_123"
         response = client.post("/api/ingresar_evaluacion", json=payload)
 
     assert response.status_code == 201
