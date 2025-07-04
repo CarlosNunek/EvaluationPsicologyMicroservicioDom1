@@ -1,5 +1,10 @@
 import json
 import pytest
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from app import app
 from unittest.mock import patch
 
@@ -9,7 +14,7 @@ def client():
     with app.test_client() as client:
         yield client
 
-@patch("app.mongo.db.evaluaciones_psicologicas.insert_one")
+@patch("app.config.mongo.mongo.db.evaluaciones_psicologicas.insert_one")
 def test_ingresar_evaluacion_exito(mock_insert, client):
     mock_insert.return_value.inserted_id = "fake_id_123"
 
